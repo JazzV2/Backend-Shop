@@ -1,3 +1,4 @@
+using backend.Core.AutoMapperConfig;
 using backend.Core.Context;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,6 +9,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("local"));
 });
+
+// Automapper Configuration
+builder.Services.AddAutoMapper(typeof(AutoMapperConfigProfile));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
