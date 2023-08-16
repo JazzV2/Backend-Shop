@@ -1,0 +1,1 @@
+# Shop Project Using .NET 7, JWT and Entity Framework.
