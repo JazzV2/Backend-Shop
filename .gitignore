@@ -12,6 +12,3 @@ bin
 *.user
 # exclude everything
 Products/
-
-# exception to the rule
-!Products/.gitkeep
