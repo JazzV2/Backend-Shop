@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using backend.Core.Dtos.AuthUser;
+using backend.Core.Dtos.Product;
 using backend.Core.Models;
 
 namespace backend.Core.AutoMapperConfig
@@ -11,6 +12,9 @@ namespace backend.Core.AutoMapperConfig
             // AuthUser
             CreateMap<RegisterDto, User>()
                 .ForMember(dest => dest.HashPassword, opt => opt.MapFrom(src => BCrypt.Net.BCrypt.HashPassword(src.Password)));
+
+            // Product
+            CreateMap<ProductCreateDto, Product>();
         }
     }
 }

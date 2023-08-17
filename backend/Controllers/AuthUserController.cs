@@ -18,9 +18,9 @@ namespace backend.Controllers
     [ApiController]
     public class AuthUserController : ControllerBase
     {
-        private IMapper _mapper;
-        private ApplicationDbContext _context;
-        private IConfiguration _configuration;
+        private readonly IMapper _mapper;
+        private readonly ApplicationDbContext _context;
+        private readonly IConfiguration _configuration;
 
         public AuthUserController(IMapper mapper, ApplicationDbContext context, IConfiguration configuration)
         {
