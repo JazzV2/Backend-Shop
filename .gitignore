@@ -10,5 +10,4 @@ bin
 */data-mssql
 **/data-mssql
 *.user
-# exclude everything
-Products/
+Upload/

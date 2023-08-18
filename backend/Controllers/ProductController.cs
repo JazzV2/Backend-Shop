@@ -34,6 +34,11 @@ namespace backend.Controllers
 
             try
             {
+                var mainPahtProducts = Path.Combine(Directory.GetCurrentDirectory(), "Upload", "Products");
+
+                if (!System.IO.Directory.Exists(mainPahtProducts))
+                    System.IO.Directory.CreateDirectory(mainPahtProducts);
+
                 var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Upload", "Products", Guid.NewGuid().ToString() + dto.Name);
 
                 newProduct.ImagesPath = filePath;
