@@ -23,12 +23,13 @@ namespace backend.Controllers
 
         [HttpPost]
         [Route("Create")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateProduct([FromForm] ProductCreateDto dto, IFormFileCollection formFileCollection)
         {
             int passCount = 0;
             int errorCount = 0;
             string message = null;
+            string hostUrl = Request.Scheme + "://" + Request.Host + Request.PathBase;
 
             var newProduct = _mapper.Map<Product>(dto);
 
@@ -39,9 +40,11 @@ namespace backend.Controllers
                 if (!System.IO.Directory.Exists(mainPahtProducts))
                     System.IO.Directory.CreateDirectory(mainPahtProducts);
 
-                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Upload", "Products", Guid.NewGuid().ToString() + dto.Name);
+                var directoryOfPhotos = Path.Combine(Guid.NewGuid().ToString() + dto.Name);
 
-                newProduct.ImagesPath = filePath;
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Upload", "Products", directoryOfPhotos);
+
+                newProduct.ImagesPath = hostUrl + "/Upload/Products/" + directoryOfPhotos;
 
                 if (!System.IO.Directory.Exists(filePath))
                     System.IO.Directory.CreateDirectory(filePath);
@@ -52,7 +55,7 @@ namespace backend.Controllers
                 foreach (var file in formFileCollection)
                 {
                     countImages++;
-                    var imagePath = Path.Combine(filePath, countImages.ToString() + ".pdf");
+                    var imagePath = Path.Combine(filePath, countImages.ToString() + ".png");
 
                     using (FileStream stream = System.IO.File.Create(imagePath))
                     {
@@ -76,5 +79,12 @@ namespace backend.Controllers
 
             return Ok("Product Created Successfully");
         }
+
+        /*[HttpGet]
+        [Route("Get")]
+        public async Task<IActionResult> GetProducts()
+        {
+
+        }*/
     }
 }
