@@ -2,9 +2,11 @@
 using backend.Core.Context;
 using backend.Core.Dtos.Product;
 using backend.Core.Models;
+using backend.CustomExceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend.Controllers
 {
@@ -26,53 +28,58 @@ namespace backend.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateProduct([FromForm] ProductCreateDto dto, IFormFileCollection formFileCollection)
         {
-            int passCount = 0;
-            int errorCount = 0;
-            string message = null;
+            // Getting link for our image
             string hostUrl = Request.Scheme + "://" + Request.Host + Request.PathBase;
-
+            // Mapping our new Product
             var newProduct = _mapper.Map<Product>(dto);
+
+            // Path where directories with photos are stored
+            var mainPahtProducts = Path.Combine(Directory.GetCurrentDirectory(), "Upload", "Products");
+
+            // New directory's name for single product images
+            var newGuid = Guid.NewGuid().ToString();
+            var directoryOfPhotos = newGuid + dto.Name;
+
+            // Path for new directory contains images
+            var directoryPath = Path.Combine(Directory.GetCurrentDirectory(), "Upload", "Products", directoryOfPhotos);
+
+            // Updating new model product (hostUrl and ImagesPath)
+            newProduct.ImagesPath = hostUrl + "/Upload/Products/" + directoryOfPhotos;
+            newProduct.UrlProduct = newGuid;
 
             try
             {
-                var mainPahtProducts = Path.Combine(Directory.GetCurrentDirectory(), "Upload", "Products");
+                if (!Directory.Exists(mainPahtProducts))
+                    Directory.CreateDirectory(mainPahtProducts);
 
-                if (!System.IO.Directory.Exists(mainPahtProducts))
-                    System.IO.Directory.CreateDirectory(mainPahtProducts);
-
-                var directoryOfPhotos = Path.Combine(Guid.NewGuid().ToString() + dto.Name);
-
-                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Upload", "Products", directoryOfPhotos);
-
-                newProduct.ImagesPath = hostUrl + "/Upload/Products/" + directoryOfPhotos;
-
-                if (!System.IO.Directory.Exists(filePath))
-                    System.IO.Directory.CreateDirectory(filePath);
+                if (!Directory.Exists(directoryPath))
+                    Directory.CreateDirectory(directoryPath);
 
                 int countImages = 0;
                 
-
                 foreach (var file in formFileCollection)
                 {
                     countImages++;
-                    var imagePath = Path.Combine(filePath, countImages.ToString() + ".png");
+                    var extension = Path.GetExtension(file.FileName);
+
+                    if (!(extension == ".jpg" || extension == ".png"))
+                        throw new InvalidFileTypeException(file.FileName, ".jpg, .png");
+
+                    var imagePath = Path.Combine(directoryPath, countImages.ToString() + extension);
 
                     using (FileStream stream = System.IO.File.Create(imagePath))
                     {
                         await file.CopyToAsync(stream);
-                        passCount++;
                     }
                 }
-                
             }
             catch (Exception ex)
             {
-                errorCount++;
-                message = "Something gone wrong: " + ex.Message + "\n" + "Photos uploaded: " + passCount.ToString() + " Photos failed: " + errorCount.ToString();
-            }
+                if (Directory.Exists(directoryPath))
+                    Directory.Delete(directoryPath, true);
 
-            if (message != null)
-                return BadRequest(message);
+                return BadRequest(ex.Message);
+            }
 
             await _context.AddAsync(newProduct);
             await _context.SaveChangesAsync();
@@ -80,11 +87,32 @@ namespace backend.Controllers
             return Ok("Product Created Successfully");
         }
 
-        /*[HttpGet]
+        [HttpGet]
         [Route("Get")]
-        public async Task<IActionResult> GetProducts()
+        public async Task<ActionResult<IEnumerable<ProductGetDto>>> GetProducts()
         {
+            var products = await _context.Products.ToListAsync();
+            var convertedProducts = _mapper.Map<IEnumerable<ProductGetDto>>(products);
 
-        }*/
+            return Ok(convertedProducts);
+        }
+
+        [HttpGet]
+        [Route("Get{url}")]
+        public async Task<ActionResult<ProductByUrlGetDto>> GetProduct([FromRoute] string url)
+        {
+            var product = await _context.Products.FirstOrDefaultAsync(product => product.UrlProduct == url);
+            var convertedProduct = _mapper.Map<ProductByUrlGetDto>(product);
+
+            if (product is null)
+                return NotFound("Couldn't find the product");
+
+            return Ok(convertedProduct);
+        }
+
+       /* [HttpPatch]
+        [Route("Update{url}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateProduct([FromBody] ProductCreateDto dto)*/
     }
 }

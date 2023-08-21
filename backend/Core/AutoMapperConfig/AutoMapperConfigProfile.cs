@@ -15,6 +15,8 @@ namespace backend.Core.AutoMapperConfig
 
             // Product
             CreateMap<ProductCreateDto, Product>();
+            CreateMap<Product, ProductGetDto>();
+            CreateMap<Product, ProductByUrlGetDto>();
         }
     }
 }
