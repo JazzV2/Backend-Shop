@@ -9,6 +9,6 @@ namespace backend.Core.Dtos.Product
         public string ShortDescription { get; set; }
         public double Price { get; set; }
         public int Number { get; set; }
-        public string ImagesPath { get; set; }
+        public string FirstImage { get; set; }
     }
 }

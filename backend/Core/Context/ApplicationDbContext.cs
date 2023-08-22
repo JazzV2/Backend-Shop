@@ -12,6 +12,7 @@ namespace backend.Core.Context
         public DbSet<User> Users { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<Image> Images { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -26,6 +27,11 @@ namespace backend.Core.Context
                 .HasOne(order => order.Product)
                 .WithMany(product => product.Orders)
                 .HasForeignKey(order => order.UrlProduct);
+
+            modelBuilder.Entity<Image>()
+                .HasOne(image => image.Product)
+                .WithMany(product => product.Images)
+                .HasForeignKey(image => image.UrlProduct);
         }
     }
 }

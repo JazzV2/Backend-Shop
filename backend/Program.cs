@@ -50,13 +50,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseStaticFiles(new StaticFileOptions()
-{
-    FileProvider = new PhysicalFileProvider(
-        Path.Combine(Directory.GetCurrentDirectory(), @"Upload")),
-    RequestPath = new PathString("/Upload")
-});
-
 app.UseHttpsRedirection();
 
 app.UseAuthentication();

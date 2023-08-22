@@ -12,8 +12,8 @@ using backend.Core.Context;
 namespace backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230816192219_initMigration")]
-    partial class initMigration
+    [Migration("20230822151627_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,34 @@ namespace backend.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("backend.Core.Models.Image", b =>
+                {
+                    b.Property<string>("ID")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("FileType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("ProductImage")
+                        .IsRequired()
+                        .HasColumnType("image");
+
+                    b.Property<string>("UrlProduct")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("UrlProduct");
+
+                    b.ToTable("Images");
+                });
 
             modelBuilder.Entity("backend.Core.Models.Order", b =>
                 {
@@ -117,12 +145,27 @@ namespace backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("UpdatedAd")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Username");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("backend.Core.Models.Image", b =>
+                {
+                    b.HasOne("backend.Core.Models.Product", "Product")
+                        .WithMany("Images")
+                        .HasForeignKey("UrlProduct")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("backend.Core.Models.Order", b =>
@@ -146,6 +189,8 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Core.Models.Product", b =>
                 {
+                    b.Navigation("Images");
+
                     b.Navigation("Orders");
                 });
 

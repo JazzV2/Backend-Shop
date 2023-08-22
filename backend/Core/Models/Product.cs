@@ -12,9 +12,9 @@ namespace backend.Core.Models
         [Required]
         public double Price { get; set; }
         public int Number { get; set; }
-        public string ImagesPath { get; set; }
 
         // Relations
         public ICollection<Order> Orders { get; set; }
+        public ICollection<Image> Images { get; set; }
     }
 }
