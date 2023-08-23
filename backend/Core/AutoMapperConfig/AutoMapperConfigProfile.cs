@@ -16,7 +16,7 @@ namespace backend.Core.AutoMapperConfig
             // Product
             CreateMap<ProductCreateDto, Product>();
             CreateMap<Product, ProductGetDto>()
-                .ForMember(dest => dest.FirstImage, opt => opt.MapFrom(src => Convert.ToBase64String(src.Images.FirstOrDefault(image => image.Name == "1").ProductImage)));
+                .ForMember(dest => dest.FirstImage, opt => opt.MapFrom(src => Convert.ToBase64String(src.Images.FirstOrDefault(image => image.IsMain).ProductImage)));
             CreateMap<Product, ProductByUrlGetDto>();
         }
     }

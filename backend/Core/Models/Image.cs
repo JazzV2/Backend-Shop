@@ -12,6 +12,7 @@ namespace backend.Core.Models
         public string FileType { get; set; }
         [Column(TypeName = "image")]
         public byte[] ProductImage { get; set; }
+        public bool IsMain { get; set; }
 
         // Relations
         public string UrlProduct { get; set; }

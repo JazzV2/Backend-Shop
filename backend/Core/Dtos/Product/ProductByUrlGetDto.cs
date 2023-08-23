@@ -10,6 +10,7 @@ namespace backend.Core.Dtos.Product
         public string LongDescription { get; set; }
         public double Price { get; set; }
         public int Number { get; set; }
+        public List<string> IDImages { get; set; }
         public List<string> Images { get; set; }
     }
 }
