@@ -58,7 +58,7 @@ namespace backend.Controllers
                         await file.CopyToAsync(stream);
                         Image newImage = new Image
                         {
-                            Name = file.Name,
+                            Name = file.FileName,
                             FileType = extension,
                             ProductImage = stream.ToArray(),
                             UrlProduct = newUrlProduct,
@@ -173,6 +173,32 @@ namespace backend.Controllers
             return Ok("Images was added successfully");
         }
 
+        [HttpPatch]
+        [Route("ChangeMain{url}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ChangeMainImage([FromRoute] string url, [FromBody] string imageID)
+        {
+            var product = await _context.Products.Include(product => product.Images).FirstOrDefaultAsync(product => product.UrlProduct == url);
+
+            if (product is null)
+                return NotFound("Couldn't find the product");
+
+            var images = product.Images.ToList();
+
+            if (!images.Any())
+                return BadRequest("This product doesn't have any images");
+
+            images.ForEach(image =>
+            {
+                if (image.ID == imageID)
+                    image.IsMain = true;
+                else
+                    image.IsMain = false;
+            });
+
+            return Ok("Main image was set");
+        }
+
         [HttpDelete]
         [Route("DeleteProductImages{ID}")]
         [Authorize(Roles = "Admin")]
@@ -191,7 +217,7 @@ namespace backend.Controllers
 
         [HttpDelete]
         [Route("DeleteProduct{url}")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete([FromRoute] string url)
         {
             var product = await _context.Products.Include(product => product.Images).FirstOrDefaultAsync(product => product.UrlProduct == url);
