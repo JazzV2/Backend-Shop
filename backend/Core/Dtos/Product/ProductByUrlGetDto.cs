@@ -1,20 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿
 
-namespace backend.Core.Models
+namespace backend.Core.Dtos.Product
 {
-    public class Product : BaseModel
+    public class ProductByUrlGetDto
     {
-        [Key]
         public string UrlProduct { get; set; }
         public string Name { get; set; }
         public string ShortDescription { get; set; }
         public string LongDescription { get; set; }
-        [Required]
         public double Price { get; set; }
         public int Number { get; set; }
-
-        // Relations
-        public ICollection<Order> Orders { get; set; }
-        public ICollection<Image> Images { get; set; }
+        public List<string> IDImages { get; set; }
+        public List<string> Images { get; set; }
     }
 }
